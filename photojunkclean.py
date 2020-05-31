@@ -12,9 +12,12 @@
 
 import click
 import os
+import shutil
 
 from pathlib import Path
 from exif import Image
+from progress.bar import Bar
+from progress.spinner import Spinner
 
 IMAGE_MAX_SIZE = 512 # 512Kb
 FILE_NAME_KEYWORDS = {"screenshot"}
@@ -26,10 +29,13 @@ FILE_NAME_KEYWORDS = {"screenshot"}
 @click.option('--move', default=None, help='folder to move junk')
 def findjunk(folder, size, move):
     """ FOLDER: folder to search for junk images """
+    move = move.strip()
+    folder = folder.strip()
     click.echo("\nPhoto Junk Clean tool\n")
     size += size * 1024
     if (move and not os.path.isdir(move)) or move == folder:
-        click.echo("Invalid move folder! Please, check the path. Aborting.")
+        click.echo("Invalid move folder: {}".format(move))
+        click.echo("Please, check the path. Aborting.")
         return
     else:
         click.echo("Folder to move files: %s" % move)
@@ -41,12 +47,18 @@ def findjunk(folder, size, move):
             if len(folderFileList) > 0:
                 fileList = fileList + folderFileList
         click.echo('\nFound %d files.' % len(fileList))
+        if move:
+            moveFiles(fileList, move)
+            click.echo("Done moving junk images. Check it!")
+        else:
+            for file in fileList:
+                click.echo('Junk file: {} ({} Kb)'.format(file["path"], int(file["size"] / 1024)))
     else:
         click.echo('Folder %s does not exists.' % folder)
 
 def getFilesFromFolder(folder, maxsize, types=[".jpg", ".jpeg", ".png"]):
-    click.echo('Inspecting folder: %s' % folder)
     fileList = []
+    spinner = Spinner('Inspecting folders... ')
     if os.path.isdir(folder):
         for root, _, files in os.walk(folder):
             for file in files:
@@ -55,7 +67,7 @@ def getFilesFromFolder(folder, maxsize, types=[".jpg", ".jpeg", ".png"]):
                 extension = os.path.splitext(file)[-1]
                 if size <= maxsize and extension in types and not fromCamera(path):
                     fileList.append({"path": path, "size": size})
-                    click.echo('--> found file %s (%d Kb)' % (path, int(size / 1024)))
+                    spinner.next()
     return fileList
 
 def findAllFolders(folder):
@@ -68,6 +80,12 @@ def findAllFolders(folder):
                 folders.append(fullpath)
                 #click.echo('-> added %s folder.' % fullpath)
     return folders
+
+def moveFiles(fileList, toFolder):
+    with Bar('Moving files', max=len(fileList)) as bar:
+        for file in fileList:
+            shutil.move(file["path"], toFolder)
+            bar.next()
 
 def haveKeywords(fileName):
     for keyword in FILE_NAME_KEYWORDS:
