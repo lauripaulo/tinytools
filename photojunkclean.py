@@ -41,13 +41,14 @@ def findjunk(folder, size, move):
         click.echo("Folder to move files: %s" % move)
     if os.path.isdir(folder):
         fileList = []
+        click.echo("Analysing files...")
         folders = findAllFolders(folder)
         for folder in folders:
             folderFileList = getFilesFromFolder(folder, size)
             if len(folderFileList) > 0:
                 fileList = fileList + folderFileList
         click.echo('\nFound %d files.' % len(fileList))
-        if move:
+        if move and len(fileList) > 0:
             moveFiles(fileList, move)
             click.echo("Done moving junk images. Check it!")
         else:
@@ -58,16 +59,19 @@ def findjunk(folder, size, move):
 
 def getFilesFromFolder(folder, maxsize, types=[".jpg", ".jpeg", ".png"]):
     fileList = []
-    spinner = Spinner('Inspecting folders... ')
     if os.path.isdir(folder):
         for root, _, files in os.walk(folder):
-            for file in files:
-                path = os.path.join(root, file)
-                size = os.path.getsize(path)
-                extension = os.path.splitext(file)[-1]
-                if size <= maxsize and extension in types and not fromCamera(path):
-                    fileList.append({"path": path, "size": size})
-                    spinner.next()
+            if len(files) == 0:
+                break
+            with Bar('-> {} '.format(folder), max=len(files)) as bar:
+                for file in files:
+                    bar.next()
+                    path = os.path.join(root, file)
+                    size = os.path.getsize(path)
+                    extension = os.path.splitext(file)[-1]
+                    if size <= maxsize and extension in types:
+                        if extension == ".png" or not fromCamera(path):
+                            fileList.append({"path": path, "size": size})
     return fileList
 
 def findAllFolders(folder):
@@ -84,7 +88,15 @@ def findAllFolders(folder):
 def moveFiles(fileList, toFolder):
     with Bar('Moving files', max=len(fileList)) as bar:
         for file in fileList:
-            shutil.move(file["path"], toFolder)
+            _, moveFileName = os.path.split(file["path"])
+            newFile = os.path.join(toFolder, moveFileName)
+            suffix = 0
+            while os.path.isfile(newFile):
+                _, name = os.path.split(newFile)
+                name, ext = os.path.splitext(name)
+                suffix += 1
+                newFile = os.path.join(toFolder, "{}-({}){}".format(name, suffix, ext))
+            shutil.move(file["path"], newFile)
             bar.next()
 
 def haveKeywords(fileName):
@@ -96,9 +108,12 @@ def haveKeywords(fileName):
 def fromCamera(file):
     hasExif = False
     with open(file, 'rb') as image_file:
-        analyseimg = Image(image_file)
-        #click.echo(dir(analyseimg))
-        hasExif = analyseimg.has_exif
+        try:
+            analyseimg = Image(image_file)
+            #click.echo(dir(analyseimg))
+            hasExif = analyseimg.has_exif
+        except:
+            click.echo('\nError reading file: {}'.format(file))
     return hasExif
 
 if __name__=="__main__":
