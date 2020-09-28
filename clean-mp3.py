@@ -43,7 +43,15 @@ from progress.bar import Bar
 from progress.spinner import Spinner
 from mp3_tagger import MP3File, VERSION_1, VERSION_2, VERSION_BOTH
 
-global_duplicates_found = 0
+class Duplicates:
+
+    def __init__(self):
+        self.total = 0
+
+    def onemore(self):
+        self.total = self.total + 1
+
+DUPLICATES = Duplicates()
 
 def findAllFolders(folder):
     folders = []
@@ -83,7 +91,7 @@ def getFilesFromFolder(folder, types=[".mp3"]):
                 break
             for file in files:
                 iterations += 1
-                spinner.message = "Analysing folder: '{}' - Files: {} - Duplicates: {} - ".format(folder, iterations, global_duplicates_found)
+                spinner.message = "Analysing folder: '{}' - Files: {} - Duplicates: {} - ".format(folder, iterations, DUPLICATES.total)
                 spinner.next()
                 path = os.path.join(root, file)
                 size = os.path.getsize(path)
@@ -99,7 +107,9 @@ def filter_duplicates(extension, types, path, fileList, size):
         try:
             tags = mp3.get_tags()
         except UnicodeDecodeError as err:
-            click.echo("Error retreiving tags, file: {} - error: {}".format(path, err.reason))
+            click.echo("\nError retreiving tags, file: {} - error: {}".format(path, err.reason))
+        except:
+            click.echo("\nBad MP3 tags , file: {}".format(path))
         for i in range(9): 
             suffix  = "({})".format(i)
             suffix2 = "_{}.".format(i)
@@ -110,7 +120,7 @@ def filter_duplicates(extension, types, path, fileList, size):
                     track = tags['ID3TagV2']['track']
                 if tags['ID3TagV2'] and tags['ID3TagV2']['song']:
                     name = tags['ID3TagV2']['song']
-                global_duplicates_found = global_duplicates_found + 1
+                DUPLICATES.onemore()
                 fileList.append({"path": path, "size": size, "track": track, "name": name})
 
 @click.command()
