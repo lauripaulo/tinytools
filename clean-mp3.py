@@ -93,7 +93,11 @@ def getFilesFromFolder(folder, types=[".mp3"]):
 def filter_duplicates(extension, types, path, fileList, size):
     if extension in types:
         mp3 = MP3File(path)
-        tags = mp3.get_tags()
+        tags = "empty"
+        try:
+            tags = mp3.get_tags()
+        except UnicodeDecodeError as err:
+            click.echo("Error retreiving tags, file: {} - error: {}".format(path, err.reason))
         for i in range(9): 
             suffix  = "({})".format(i)
             suffix2 = "_{}.".format(i)
