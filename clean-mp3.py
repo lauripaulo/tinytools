@@ -75,16 +75,17 @@ def getFilesFromFolder(folder, types=[".mp3"]):
     spinner = Spinner()
     if os.path.isdir(folder):
         for root, _, files in os.walk(folder):
-            iterations += 1
-            spinner.message = "Analysing folder: '{}' - Files: {} - ".format(folder, iterations)
-            spinner.next()
             if len(files) == 0:
                 break
             for file in files:
+                iterations += 1
+                spinner.message = "Analysing folder: '{}' - Files: {} - Duplicates: {} - ".format(folder, iterations, len(fileList))
+                spinner.next()
                 path = os.path.join(root, file)
                 size = os.path.getsize(path)
                 extension = os.path.splitext(file)[-1]
                 filter_duplicates(extension, types, path, fileList, size)
+            spinner.clearln()
     return fileList
 
 def filter_duplicates(extension, types, path, fileList, size):
@@ -93,8 +94,15 @@ def filter_duplicates(extension, types, path, fileList, size):
         tags = mp3.get_tags()
         for i in range(9): 
             suffix  = "({})".format(i)
-            if suffix in path:
-                fileList.append({"path": path, "size": size, "track": tags['ID3TagV2']['track'], "name": tags['ID3TagV2']['song']})
+            suffix2 = "_{}.".format(i)
+            if suffix in path or suffix2 in path:
+                track = "empty"
+                name = "empty"
+                if tags['ID3TagV2'] and tags['ID3TagV2']['track']:
+                    track = tags['ID3TagV2']['track']
+                if tags['ID3TagV2'] and tags['ID3TagV2']['song']:
+                    name = tags['ID3TagV2']['song']
+                fileList.append({"path": path, "size": size, "track": track, "name": name})
 
 @click.command()
 @click.argument('folder')
@@ -109,7 +117,7 @@ def find_duplicates(folder):
         if len(folderFileList) > 0:
             fileList = fileList + folderFileList
     if len(fileList) > 0:
-        click.echo("Found {} duplicated files.".format(len(files)))
+        click.echo("Found {} duplicated files.".format(len(fileList)))
         moveFiles(fileList, "D:\\Work\\MP3-Duplicada")
         click.echo("\nDone.\n")
     else:
