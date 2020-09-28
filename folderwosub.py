@@ -39,6 +39,23 @@ import pathlib
 from pathlib import Path
 from progress.bar import Bar
 from progress.spinner import Spinner
+from mp3_tagger import MP3File, VERSION_1, VERSION_2, VERSION_BOTH
+
+def findMp3Artist(file):
+    mp3 = MP3File(file)
+    tags = "empty"
+    try:
+        tags = mp3.get_tags()
+    except UnicodeDecodeError as err:
+        print("\nError retreiving tags, file: {} - error: {}".format(path, err.reason))
+    except:
+        print("\nBad MP3 tags , file: {}".format(path))
+    artist = "empty"
+    if tags['ID3TagV2'] and tags['ID3TagV2']['artist']:
+        artist = tags['ID3TagV2']['artist']
+    print(" -> {}".format(artist))
+    return artist
+
 
 def findAllFolders(folder):
     folders = [f.path for f in os.scandir(folder) if f.is_dir()]
@@ -51,8 +68,11 @@ def main(folder):
     for folder in folders:
         subFolders = [f.path for f in os.scandir(folder) if f.is_dir()]
         if len(subFolders) == 0:
-            foundFolderList.append(folder)
             print("Found folder: '{}'".format(folder))
+            files = [f.path for f in os.scandir(folder) if f.is_file() and ".mp3" in f.name]
+            if len(files) > 0:
+                artist = findMp3Artist(files[0])
+                foundFolderList.append({"folder": folder, "artist": artist})
     return foundFolderList
 
 def find_folders_without_subfolders():
