@@ -67,12 +67,30 @@ def moveFiles(fileList, toFolder):
             shutil.move(file["path"], newFile)
             bar.next()
 
+def getFilesFromFolder(folder, types=[".mp3"]):
+    fileList = []
+    if os.path.isdir(folder):
+        for root, _, files in os.walk(folder):
+            if len(files) == 0:
+                break
+            with Bar('-> {} '.format(folder), max=len(files)) as bar:
+                for file in files:
+                    bar.next()
+                    path = os.path.join(root, file)
+                    size = os.path.getsize(path)
+                    extension = os.path.splitext(file)[-1]
+                    if extension in types:
+                        fileList.append({"path": path, "size": size})
+    return fileList
+
 @click.command()
 @click.argument('folder')
 def find_duplicates(folder):
     folder = folder.strip()
     click.echo("\nMP3 duplicate finder tool\n")
     click.echo("Folder: {}".format(folder))
+    files = getFilesFromFolder(folder)
+    print(files)
     pass
 
 if __name__=="__main__":
