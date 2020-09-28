@@ -103,8 +103,9 @@ def find_duplicates(folder):
     if len(files) > 0:
         click.echo("Found {} duplicated files.".format(len(files)))
         moveFiles(files, "D:\\Work\\MP3-Duplicada")
+        click.echo("\nDone.\n")
     else:
-        click.echo("No duplicated found.")
+        click.echo("\nNo duplicates found.\n")
 
 if __name__=="__main__":
     find_duplicates()
