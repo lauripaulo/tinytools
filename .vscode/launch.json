@@ -5,13 +5,23 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: MP3",
+            "name": "Python: MP3 - Carro",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "D:\\Música",
+                "C:\\Users\\lauri\\Desktop\\MP3-Carro-Convertida",
+            ]
+        },
+        {
+            "name": "Python: MP3 - Lib",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "D:\\MP3",
             ]
         },
         {

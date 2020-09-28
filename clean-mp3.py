@@ -37,7 +37,6 @@ import os
 import shutil
 
 from pathlib import Path
-from exif import Image
 from progress.bar import Bar
 from progress.spinner import Spinner
 from mp3_tagger import MP3File, VERSION_1, VERSION_2, VERSION_BOTH
@@ -45,11 +44,15 @@ from mp3_tagger import MP3File, VERSION_1, VERSION_2, VERSION_BOTH
 def findAllFolders(folder):
     folders = []
     folders.append(folder)
+    spinner = Spinner()
     if os.path.isdir(folder):
         for root, dirs, _ in os.walk(folder):
             for folder in dirs:
                 fullpath = os.path.join(root, folder)
                 folders.append(fullpath)
+                spinner.message = "Analysing folders: "
+                spinner.next()
+    click.echo("\nFound {} folders.".format(len(folders)))
     return folders
 
 def moveFiles(fileList, toFolder):
@@ -69,11 +72,11 @@ def moveFiles(fileList, toFolder):
 def getFilesFromFolder(folder, types=[".mp3"]):
     fileList = []
     iterations = 0
-    spinner = Spinner('Analysing files: ')
+    spinner = Spinner()
     if os.path.isdir(folder):
         for root, _, files in os.walk(folder):
             iterations += 1
-            spinner.message = "Analysing files: {} - ".format(iterations)
+            spinner.message = "Analysing folder: '{}' - Files: {} - ".format(folder, iterations)
             spinner.next()
             if len(files) == 0:
                 break
@@ -99,10 +102,15 @@ def find_duplicates(folder):
     folder = folder.strip()
     click.echo("\nMP3 duplicate finder tool\n")
     click.echo("Folder: {}".format(folder))
-    files = getFilesFromFolder(folder)
-    if len(files) > 0:
+    folders = findAllFolders(folder)
+    fileList = []
+    for folder in folders:
+        folderFileList = getFilesFromFolder(folder)
+        if len(folderFileList) > 0:
+            fileList = fileList + folderFileList
+    if len(fileList) > 0:
         click.echo("Found {} duplicated files.".format(len(files)))
-        moveFiles(files, "D:\\Work\\MP3-Duplicada")
+        moveFiles(fileList, "D:\\Work\\MP3-Duplicada")
         click.echo("\nDone.\n")
     else:
         click.echo("\nNo duplicates found.\n")
