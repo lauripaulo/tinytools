@@ -35,6 +35,8 @@
 import click
 import os
 import shutil
+import json
+import pathlib
 
 from pathlib import Path
 from progress.bar import Bar
@@ -118,6 +120,8 @@ def find_duplicates(folder):
             fileList = fileList + folderFileList
     if len(fileList) > 0:
         click.echo("Found {} duplicated files.".format(len(fileList)))
+        with open(os.path.join(pathlib.Path().absolute(), "duplicated-files-log.json"), "w+") as log_file:
+            json.dump(fileList, log_file)
         moveFiles(fileList, "D:\\Work\\MP3-Duplicada")
         click.echo("\nDone.\n")
     else:
