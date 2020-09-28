@@ -40,7 +40,7 @@ from pathlib import Path
 from exif import Image
 from progress.bar import Bar
 from progress.spinner import Spinner
-
+from mp3_tagger import MP3File, VERSION_1, VERSION_2, VERSION_BOTH
 
 def findAllFolders(folder):
     folders = []
@@ -50,7 +50,6 @@ def findAllFolders(folder):
             for folder in dirs:
                 fullpath = os.path.join(root, folder)
                 folders.append(fullpath)
-                #click.echo('-> added %s folder.' % fullpath)
     return folders
 
 def moveFiles(fileList, toFolder):
@@ -69,19 +68,30 @@ def moveFiles(fileList, toFolder):
 
 def getFilesFromFolder(folder, types=[".mp3"]):
     fileList = []
+    iterations = 0
+    spinner = Spinner('Analysing files: ')
     if os.path.isdir(folder):
         for root, _, files in os.walk(folder):
+            iterations += 1
+            spinner.message = "Analysing files: {} - ".format(iterations)
+            spinner.next()
             if len(files) == 0:
                 break
-            with Bar('-> {} '.format(folder), max=len(files)) as bar:
-                for file in files:
-                    bar.next()
-                    path = os.path.join(root, file)
-                    size = os.path.getsize(path)
-                    extension = os.path.splitext(file)[-1]
-                    if extension in types:
-                        fileList.append({"path": path, "size": size})
+            for file in files:
+                path = os.path.join(root, file)
+                size = os.path.getsize(path)
+                extension = os.path.splitext(file)[-1]
+                filter_duplicates(extension, types, path, fileList, size)
     return fileList
+
+def filter_duplicates(extension, types, path, fileList, size):
+    if extension in types:
+        mp3 = MP3File(path)
+        tags = mp3.get_tags()
+        for i in range(9): 
+            suffix  = "({})".format(i)
+            if suffix in path:
+                fileList.append({"path": path, "size": size, "track": tags['ID3TagV2']['track'], "name": tags['ID3TagV2']['song']})
 
 @click.command()
 @click.argument('folder')
@@ -90,8 +100,11 @@ def find_duplicates(folder):
     click.echo("\nMP3 duplicate finder tool\n")
     click.echo("Folder: {}".format(folder))
     files = getFilesFromFolder(folder)
-    print(files)
-    pass
+    if len(files) > 0:
+        click.echo("Found {} duplicated files.".format(len(files)))
+        moveFiles(files, "D:\\Work\\MP3-Duplicada")
+    else:
+        click.echo("No duplicated found.")
 
 if __name__=="__main__":
     find_duplicates()
