@@ -82,8 +82,11 @@ def find_folders_without_subfolders():
     print("Folder: '{}'".format(folder))
     print("Log file: '{}'".format(logFile))
     foundFolderList = main(folder)
-    with open(os.path.join(pathlib.Path().absolute(), logFile), "w+") as log_file:
-        json.dump(foundFolderList, log_file)
+    if len(foundFolderList) > 0:
+        with open(os.path.join(pathlib.Path().absolute(), logFile), "w+") as log_file:
+            json.dump(foundFolderList, log_file)
+    else:
+        print("No folders without subfolders found.\n")
     pass
 
 if __name__=="__main__":
