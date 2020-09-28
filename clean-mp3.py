@@ -43,6 +43,8 @@ from progress.bar import Bar
 from progress.spinner import Spinner
 from mp3_tagger import MP3File, VERSION_1, VERSION_2, VERSION_BOTH
 
+global_duplicates_found = 0
+
 def findAllFolders(folder):
     folders = []
     folders.append(folder)
@@ -81,7 +83,7 @@ def getFilesFromFolder(folder, types=[".mp3"]):
                 break
             for file in files:
                 iterations += 1
-                spinner.message = "Analysing folder: '{}' - Files: {} - Duplicates: {} - ".format(folder, iterations, len(fileList))
+                spinner.message = "Analysing folder: '{}' - Files: {} - Duplicates: {} - ".format(folder, iterations, global_duplicates_found)
                 spinner.next()
                 path = os.path.join(root, file)
                 size = os.path.getsize(path)
@@ -108,6 +110,7 @@ def filter_duplicates(extension, types, path, fileList, size):
                     track = tags['ID3TagV2']['track']
                 if tags['ID3TagV2'] and tags['ID3TagV2']['song']:
                     name = tags['ID3TagV2']['song']
+                global_duplicates_found = global_duplicates_found + 1
                 fileList.append({"path": path, "size": size, "track": track, "name": name})
 
 @click.command()
