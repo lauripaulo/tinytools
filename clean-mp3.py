@@ -83,6 +83,8 @@ def moveFiles(fileList, toFolder):
 
 def getFilesFromFolder(folder, types=[".mp3"]):
     fileList = []
+    missign_tracks = []
+    tracks = []
     iterations = 0
     spinner = Spinner()
     if os.path.isdir(folder):
@@ -96,32 +98,45 @@ def getFilesFromFolder(folder, types=[".mp3"]):
                 path = os.path.join(root, file)
                 size = os.path.getsize(path)
                 extension = os.path.splitext(file)[-1]
-                filter_duplicates(extension, types, path, fileList, size)
+                if extension in types:
+                    mp3 = MP3File(path)
+                    tags = get_mp3_tags(mp3)
+                    tracks.append(tags)
+                    filter_duplicates(tags, extension, types, path, fileList, size)
             spinner.clearln()
-    return fileList
+            missign_tracks.append(find_missing_tracks(tracks))
+    return fileList, missign_tracks
 
-def filter_duplicates(extension, types, path, fileList, size):
-    if extension in types:
-        mp3 = MP3File(path)
-        tags = "empty"
-        try:
-            tags = mp3.get_tags()
-        except UnicodeDecodeError as err:
-            click.echo("\nError retreiving tags, file: {} - error: {}".format(path, err.reason))
-        except:
-            click.echo("\nBad MP3 tags , file: {}".format(path))
-        for i in range(9): 
-            suffix  = "({})".format(i)
-            suffix2 = "_{}.".format(i)
-            if suffix in path or suffix2 in path:
-                track = "empty"
-                name = "empty"
-                if tags['ID3TagV2'] and tags['ID3TagV2']['track']:
-                    track = tags['ID3TagV2']['track']
-                if tags['ID3TagV2'] and tags['ID3TagV2']['song']:
-                    name = tags['ID3TagV2']['song']
-                DUPLICATES.onemore()
-                fileList.append({"path": path, "size": size, "track": track, "name": name})
+def get_mp3_tags(mp3):
+    tags = "empty"
+    try:
+        tags = mp3.get_tags()
+    except UnicodeDecodeError as err:
+        click.echo("\nError retreiving tags, file: {} - error: {}".format(path, err.reason))
+    except:
+        click.echo("\nBad MP3 tags , file: {}".format(path))
+    return tags
+
+def find_missing_tracks(tracks):
+    missing_tracks = []
+    for track in tracks:
+        track_number = track['ID3TagV2']['track']
+        missing_tracks.append(track_number)
+    return missing_tracks
+
+def filter_duplicates(tags, extension, types, path, fileList, size):
+    for i in range(9): 
+        suffix  = "({})".format(i)
+        suffix2 = "_{}.".format(i)
+        if suffix in path or suffix2 in path:
+            track = "empty"
+            name = "empty"
+            if tags['ID3TagV2'] and tags['ID3TagV2']['track']:
+                track = tags['ID3TagV2']['track']
+            if tags['ID3TagV2'] and tags['ID3TagV2']['song']:
+                name = tags['ID3TagV2']['song']
+            DUPLICATES.onemore()
+            fileList.append({"path": path, "size": size, "track": track, "name": name})
 
 @click.command()
 @click.argument('folder')
@@ -132,7 +147,8 @@ def find_duplicates(folder):
     folders = findAllFolders(folder)
     fileList = []
     for folder in folders:
-        folderFileList = getFilesFromFolder(folder)
+        folderFileList, missing_tracks = getFilesFromFolder(folder)
+        click.echo("Missing tracks: {}".format(missing_tracks))
         if len(folderFileList) > 0:
             fileList = fileList + folderFileList
     if len(fileList) > 0:
