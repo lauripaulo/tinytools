@@ -34,6 +34,7 @@
 
 import os
 import json
+import re
 from PyPDF2 import PdfFileReader
 from PyPDF2.utils import PdfReadError
 from PyPDF2.pdf import PageObject
@@ -49,15 +50,13 @@ def getFilesFromFolder(folder, types=[".pdf"]):
         for root, _, files in os.walk(folder):
             if len(files) == 0:
                 break
-            with Bar('-> {} '.format(folder), max=len(files)) as bar:
-                for file in files:
-                    bar.next()
-                    path = os.path.join(root, file)
-                    size = os.path.getsize(path)
-                    extension = os.path.splitext(file)[-1]
-                    if extension == ".pdf":
-                        info, pages = extract_information(path)
-                        fileList.append({"filename": file, "fullpath": path, "size": size, "pages": pages, "info": info})
+            for file in files:
+                path = os.path.join(root, file)
+                size = os.path.getsize(path)
+                extension = os.path.splitext(file)[-1]
+                if extension == ".pdf":
+                    info, pages = extract_information(path)
+                    fileList.append({"filename": file, "fullpath": path, "size": size, "pages": pages, "info": info})
     return fileList
 
 
@@ -77,7 +76,7 @@ def extract_information(pdf_path):
     number_of_pages = 0
     try:
         with open(pdf_path, 'rb') as f:
-            pdf = PdfFileReader(f)
+            pdf = PdfFileReader(f, strict=False)
             docinfo = pdf.getDocumentInfo()
             number_of_pages = pdf.getNumPages()
             text = get_firstpage_text(pdf)
@@ -97,17 +96,20 @@ def extract_information(pdf_path):
 def get_firstpage_text(pdf):
     page = pdf.getPage(pageNumber=0)
     text = page.extractText()
+    #text = re.sub(r'\W+', '', text)
+    text = ''.join(c for c in text if c.isalnum() or c == ' ')
     return text
 
 def find_pdf_books(folder):
     fileList = []
-    print("Analysing files...")
-    print("-> Folder: {}".format(folder))
+    print("PDF organizer\n")
     folders = findAllFolders(folder)
-    for folder in folders:
-        folderFileList = getFilesFromFolder(folder)
-        if len(folderFileList) > 0:
-            fileList = fileList + folderFileList
+    with Bar('-> Analysing files ', max=len(folders)) as bar:
+        for folder in folders:
+            bar.next()
+            folderFileList = getFilesFromFolder(folder)
+            if len(folderFileList) > 0:
+                fileList = fileList + folderFileList
     with open('data.json', 'w') as f:
         json.dump(fileList, f, ensure_ascii=False, indent=4)
         print("JSON saved.")
