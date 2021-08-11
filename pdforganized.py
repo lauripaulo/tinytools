@@ -119,5 +119,5 @@ def find_pdf_books(folder):
 
 
 if __name__=="__main__":
-    find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/RPG/")
-    #find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/")
+    #find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/RPG/")
+    find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/")

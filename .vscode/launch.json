@@ -5,14 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: FWSF",
+            "name": "Python: PDF",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "D:\\MP3",
-                "fwsf-logfile.json"
             ]
         },
         {
