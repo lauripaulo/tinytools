@@ -8,8 +8,9 @@ mccabe==0.6.1
 mp3-tagger==1.0
 progress==1.5
 pylint==2.5.2
+PyPDF2==1.26.0
 pytaglib==1.4.6
-rope==0.17.0
+rope==0.19.0
 six==1.15.0
 toml==0.10.1
 wrapt==1.12.1
