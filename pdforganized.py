@@ -77,6 +77,8 @@ def extract_information(pdf_path):
     try:
         with open(pdf_path, 'rb') as f:
             pdf = PdfFileReader(f, strict=False)
+            if pdf.isEncrypted:
+                pdf.decrypt('')
             docinfo = pdf.getDocumentInfo()
             number_of_pages = pdf.getNumPages()
             text = get_firstpage_text(pdf)
