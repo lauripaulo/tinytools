@@ -33,6 +33,7 @@
 #
 
 import os
+import json
 from PyPDF2 import PdfFileReader
 from PyPDF2.utils import PdfReadError
 from pathlib import Path
@@ -41,7 +42,7 @@ from progress.spinner import Spinner
 
 PDF_MIN_SIZE = 512 # 512Kb
 
-def getFilesFromFolder(folder, minsize, types=[".pdf"]):
+def getFilesFromFolder(folder, types=[".pdf"]):
     fileList = []
     if os.path.isdir(folder):
         for root, _, files in os.walk(folder):
@@ -53,10 +54,9 @@ def getFilesFromFolder(folder, minsize, types=[".pdf"]):
                     path = os.path.join(root, file)
                     size = os.path.getsize(path)
                     extension = os.path.splitext(file)[-1]
-                    if size >= minsize and extension in types:
-                        if extension == ".pdf":
-                            info, pages = extract_information(path)
-                            fileList.append({"path": path, "size": size, "pages": pages, "info": info})
+                    if extension == ".pdf":
+                        info, pages = extract_information(path)
+                        fileList.append({"filename": file, "fullpath": path, "size": size, "pages": pages, "info": info})
     return fileList
 
 
@@ -72,14 +72,24 @@ def findAllFolders(folder):
     return folders
 
 def extract_information(pdf_path):
+    information = None
+    number_of_pages = 0
     try:
         with open(pdf_path, 'rb') as f:
             pdf = PdfFileReader(f)
-            information = pdf.getDocumentInfo()
+            docinfo = pdf.getDocumentInfo()
             number_of_pages = pdf.getNumPages()
-        return information, number_of_pages
-    except PdfReadError as error:
-        return error.args[0], 0
+            if docinfo:
+                information = {"author": docinfo.author, 
+                    "creator": docinfo.creator,
+                    "producer": docinfo.producer,
+                    "subject": docinfo.subject,
+                    "title": docinfo.title}
+            else:
+                information = {"error": "no info"}
+    except Exception as error:
+        information = {"error": error.args[0]}
+    return information, number_of_pages
 
 def find_pdf_books(folder):
     fileList = []
@@ -87,12 +97,15 @@ def find_pdf_books(folder):
     print("-> Folder: {}".format(folder))
     folders = findAllFolders(folder)
     for folder in folders:
-        folderFileList = getFilesFromFolder(folder, PDF_MIN_SIZE)
+        folderFileList = getFilesFromFolder(folder)
         if len(folderFileList) > 0:
             fileList = fileList + folderFileList
-    print(fileList)
+    with open('data.json', 'w') as f:
+        json.dump(fileList, f, ensure_ascii=False, indent=4)
+        print("JSON saved.")
     print('\nFound %d files.' % len(fileList))
 
 
 if __name__=="__main__":
-    find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/RPG/")
+    #find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/RPG/")
+    find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/")
