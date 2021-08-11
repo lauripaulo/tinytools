@@ -36,6 +36,7 @@ import os
 import json
 from PyPDF2 import PdfFileReader
 from PyPDF2.utils import PdfReadError
+from PyPDF2.pdf import PageObject
 from pathlib import Path
 from progress.bar import Bar
 from progress.spinner import Spinner
@@ -79,17 +80,24 @@ def extract_information(pdf_path):
             pdf = PdfFileReader(f)
             docinfo = pdf.getDocumentInfo()
             number_of_pages = pdf.getNumPages()
+            text = get_firstpage_text(pdf)
             if docinfo:
                 information = {"author": docinfo.author, 
                     "creator": docinfo.creator,
                     "producer": docinfo.producer,
                     "subject": docinfo.subject,
-                    "title": docinfo.title}
+                    "title": docinfo.title,
+                    "text": text}
             else:
                 information = {"error": "no info"}
     except Exception as error:
         information = {"error": error.args[0]}
     return information, number_of_pages
+
+def get_firstpage_text(pdf):
+    page = pdf.getPage(pageNumber=0)
+    text = page.extractText()
+    return text
 
 def find_pdf_books(folder):
     fileList = []
@@ -107,5 +115,5 @@ def find_pdf_books(folder):
 
 
 if __name__=="__main__":
-    #find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/RPG/")
-    find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/")
+    find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/RPG/")
+    #find_pdf_books("/mnt/win10ssd/Users/lauri/Google Drive/Pessoal/")
