@@ -46,6 +46,17 @@
                 "D:\\Junior\\OneDrive\\Imagens\\Junk",
                 "D:\\Junior\\OneDrive\\Imagens\\Biblioteca de Fotos",
             ]
+        },
+        {
+            "name": "Python: Fedora",
+            "type": "python",
+            "request": "launch",
+            "program": "compare-dnf.py",
+            "console": "integratedTerminal",
+            "args": [
+                "fedora-desktop-installed.txt",
+                "fedora-notebook-installed.txt",
+            ]
         }
     ]
 }
