@@ -54,8 +54,9 @@
             "program": "compare-dnf.py",
             "console": "integratedTerminal",
             "args": [
-                "fedora-desktop-installed.txt",
-                "fedora-notebook-installed.txt",
+                "fedora-flatpak-installed.txt",
+                "fedora-flatpak-notebook-installed.txt",
+                "--is_flatpak"
             ]
         }
     ]
