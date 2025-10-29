@@ -1,0 +1,48 @@
+Bambu Studio	com.bambulab.BambuStudio	2.3.0 Public Release	stable	flathub	system
+Brave	com.brave.Browser	1.83.120	stable	flathub	user
+calibre	com.calibre_ebook.calibre	8.13.0	stable	flathub	user
+Flatseal	com.github.tchx84.Flatseal	2.4.0	stable	fedora	system
+Whatsie	com.ktechpit.whatsie	4.16.3	stable	flathub	system
+ZapZap	com.rtosta.zapzap	6.2.1	stable	flathub	system
+Spotify	com.spotify.Client	1.2.63.394.g126b0d89	stable	flathub	user
+DBeaver Community	io.dbeaver.DBeaverCommunity	25.2.3	stable	flathub	system
+CrealityPrint	io.github.crealityofficial.CrealityPrint	6.2.0	master	crealityprint-origin	system
+Warehouse	io.github.flattool.Warehouse	2.1.0	stable	flathub	system
+Solaar	io.github.pwr_solaar.solaar	1.1.16	stable	flathub	system
+CPU-X	io.github.thetumultuousunicornofdarkness.cpu-x	5.4.0	stable	flathub	user
+Gear Lever	it.mijorus.gearlever	3.4.5	stable	flathub	system
+Joplin	net.cozic.joplin_desktop	3.3.12	stable	flathub	user
+Resources	net.nokyan.Resources	1.9.0	stable	flathub	user
+Angry IP Scanner	org.angryip.ipscan	3.9.1	stable	flathub	system
+Easyflatpak	org.dupot.easyflatpak	3.24.1	stable	flathub	system
+Breeze	org.fedoraproject.Gtk3theme.Breeze		3.22	fedora	system
+Fedora Platform	org.fedoraproject.Platform	43	f43	fedora	system
+default	org.fedoraproject.Platform.CL.default		f43	fedora	system
+Mesa	org.fedoraproject.Platform.GL.default		f43	fedora	system
+fedoraproject plataforma traduções	org.fedoraproject.Platform.Locale		f43	fedora	system
+FreeCAD	org.freecad.FreeCAD	1.0.2	stable	flathub	system
+Freedesktop Platform	org.freedesktop.Platform	freedesktop-sdk-24.08.27	24.08	flathub	user
+Freedesktop Platform	org.freedesktop.Platform	freedesktop-sdk-25.08.2	25.08	flathub	system
+Freedesktop Platform	org.freedesktop.Platform	freedesktop-sdk-25.08.2	25.08	flathub	user
+Mesa	org.freedesktop.Platform.GL.default	25.2.4	24.08	flathub	system
+Mesa	org.freedesktop.Platform.GL.default	25.2.4	24.08	flathub	user
+Mesa (Extra)	org.freedesktop.Platform.GL.default	25.2.4	24.08extra	flathub	system
+Mesa (Extra)	org.freedesktop.Platform.GL.default	25.2.4	24.08extra	flathub	user
+Mesa	org.freedesktop.Platform.GL.default	25.2.4	25.08	flathub	system
+Mesa	org.freedesktop.Platform.GL.default	25.2.4	25.08	flathub	user
+Mesa (Extra)	org.freedesktop.Platform.GL.default	25.2.4	25.08-extra	flathub	system
+Mesa (Extra)	org.freedesktop.Platform.GL.default	25.2.4	25.08-extra	flathub	user
+Codecs Extra Extension	org.freedesktop.Platform.codecs-extra		25.08-extra	flathub	system
+Codecs Extra Extension	org.freedesktop.Platform.codecs-extra		25.08-extra	flathub	user
+openh264	org.freedesktop.Platform.openh264	2.5.1	2.5.1	flathub	system
+openh264	org.freedesktop.Platform.openh264	2.5.1	2.5.1	flathub	user
+GNOME Application Platform version 47	org.gnome.Platform		47	flathub	system
+GNOME Application Platform version 48	org.gnome.Platform		48	flathub	system
+GNOME Application Platform version 49	org.gnome.Platform		49	flathub	system
+GNOME Application Platform version 49	org.gnome.Platform		49	flathub	user
+Breeze GTK theme	org.gtk.Gtk3theme.Breeze	6.5.1	3.22	flathub	system
+Breeze GTK theme	org.gtk.Gtk3theme.Breeze	6.5.1	3.22	flathub	user
+KDE Application Platform	org.kde.Platform		5.15-24.08	flathub	system
+KDE Application Platform	org.kde.Platform		6.8	flathub	system
+KDE Application Platform	org.kde.Platform		6.9	flathub	system
+Signal Desktop	org.signal.Signal	7.76.0	stable	flathub	system
