@@ -31,16 +31,29 @@ def parse_flatpak_packages(file_path):
             # Split the line by tabs (Flatpak uses tab-separated format)
             parts = line.split('\t')
             if len(parts) >= 6:
+                if parts[5] == "user":
+                    package_info = {
+                        "name": parts[0],           # e.g., "Bambu Studio"
+                        "app_id": parts[1],         # e.g., "com.bambulab.BambuStudio"
+                        "version": parts[2],        # e.g., "2.3.0 Public Release"
+                        "branch": parts[3],         # e.g., "stable"
+                        "origin": parts[4],         # e.g., "flathub"
+                        "installation": parts[5],   # e.g., "system" or "user"
+                    }
+                    packages.append(package_info)
+            elif len(parts) >= 5:
                 package_info = {
                     "name": parts[0],           # e.g., "Bambu Studio"
                     "app_id": parts[1],         # e.g., "com.bambulab.BambuStudio"
                     "version": parts[2],        # e.g., "2.3.0 Public Release"
                     "branch": parts[3],         # e.g., "stable"
-                    "origin": parts[4],         # e.g., "flathub"
-                    "installation": parts[5],   # e.g., "system" or "user"
+                    "origin": "default",        # e.g., "flathub"
+                    "installation": parts[4],   # default to system if not specified
                 }
                 packages.append(package_info)
-
+            else:
+                raise ValueError("Invalid Flatpak package line format")
+                    
         return packages
 
     except FileNotFoundError:
